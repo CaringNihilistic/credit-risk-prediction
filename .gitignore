@@ -1,0 +1,22 @@
+# Data files — never commit CSVs to GitHub (too large)
+data/
+*.csv
+
+# Model files
+models/
+*.pkl
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+
+# MLflow
+mlruns/
+
+# Environment
+.env
+venv/
+mlflow.db
+requirements.txt.txt
+src/Operations_on_main.ipynb
