@@ -155,7 +155,21 @@ All training runs are tracked with MLflow, logging:
 - Full XGBoost model artifact
 
 ---
+## Experiment Tracking (MLflow)
 
+![MLflow Dashboard](docs/mlflow_dashboard.png)
+
+All training runs are tracked with MLflow, logging:
+- All 11 Optuna hyperparameters
+- Dataset statistics (train size, features, class weight)
+- Validation ROC-AUC, optimal threshold, best iteration
+- Feature importance CSV
+- Full XGBoost model artifact
+
+View the dashboard locally:
+```bash
+mlflow ui --backend-store-uri sqlite:///mlflow.db
+```
 ## Tech Stack
 
 | Tool | Purpose |
