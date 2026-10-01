@@ -4,7 +4,7 @@
 [![XGBoost](https://img.shields.io/badge/XGBoost-2.x-orange?style=flat-square)](https://xgboost.readthedocs.io)
 [![Optuna](https://img.shields.io/badge/Optuna-3.x-green?style=flat-square)](https://optuna.org)
 [![MLflow](https://img.shields.io/badge/MLflow-3.x-blue?style=flat-square)](https://mlflow.org)
-[![Tests](https://img.shields.io/badge/Tests-24%20passed-brightgreen?style=flat-square)](tests/)
+[![Tests](https://img.shields.io/badge/Tests-27%20passed-brightgreen?style=flat-square)](tests/)
 [![Kaggle AUC](https://img.shields.io/badge/Kaggle%20Public%20AUC-0.782-gold?style=flat-square)](https://www.kaggle.com/c/home-credit-default-risk)
 [![HuggingFace](https://img.shields.io/badge/🤗%20Live%20Demo-HuggingFace%20Spaces-yellow?style=flat-square)](https://huggingface.co/spaces/ayushthecaringnihilist/credit-risk-prediction)
 
@@ -63,7 +63,7 @@ credit-risk-prediction/
 │   ├── train.py                 # Optuna search + final model training
 │   └── predict.py               # Test set inference + submission
 ├── tests/
-│   └── test_features.py         # 24 unit tests (pytest)
+│   └── test_features.py         # 27 unit tests (pytest)
 ├── app.py                       # Gradio 5 web app (HuggingFace Spaces)
 ├── requirements.txt
 └── README.md
@@ -169,7 +169,7 @@ mlflow ui --backend-store-uri sqlite:///mlflow.db
 ### 7. Run unit tests
 ```bash
 pytest tests/ -v
-# → 24 tests, all passing
+# → 27 tests, all passing
 ```
 
 ---
@@ -178,16 +178,14 @@ pytest tests/ -v
 
 The app runs on HuggingFace Spaces with **Gradio 5** and **Python 3.13**.
 
-All files are deployed flat in the Space root (not inside `src/`):
+The Space mirrors this repo's layout — `app.py` imports its feature functions from `src/`, so only the two modules it uses are deployed:
 
 ```
 Space root/
 ├── app.py                      # Gradio 5 UI entrypoint
-├── config.py
-├── data_loader.py
-├── feature_engineering.py
-├── predict.py
-├── train.py
+├── src/
+│   ├── config.py
+│   └── feature_engineering.py
 ├── xgb_credit_risk_final.pkl   # Trained model artifact
 └── requirements.txt
 ```
@@ -198,7 +196,7 @@ Space root/
 2. Human-readable values are converted to model format:
    - `Age (years)` → `DAYS_BIRTH = -age × 365`
    - `Years employed` → `DAYS_EMPLOYED = -years × 365` (or `365243` if unemployed)
-3. 13 derived features are computed using the same pipeline as training
+3. 13 derived features are computed by the same `src/feature_engineering.py` functions used in training
 4. DataFrame is aligned to the model's exact 157-feature column order via `reindex()`
 5. `model.predict_proba()` returns the default probability
 6. Threshold **0.677** classifies: `< 0.40` Low · `0.40–0.677` Medium · `≥ 0.677` High Risk
@@ -241,7 +239,7 @@ mlflow ui --backend-store-uri sqlite:///mlflow.db
 | Gradio 5 | Web UI for live demo |
 | HuggingFace Spaces | Model deployment |
 | pandas / numpy | Data manipulation |
-| pytest | Unit testing (24 tests) |
+| pytest | Unit testing (27 tests) |
 | CUDA / RTX 3050 | GPU-accelerated training |
 
 ---

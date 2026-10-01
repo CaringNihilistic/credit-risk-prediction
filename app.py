@@ -4,10 +4,14 @@ sys.path.insert(0, os.path.dirname(__file__))
 import gradio as gr
 import joblib
 import pandas as pd
-import numpy as np
+
+from src.config import MODEL_DIR, MODEL_FILE
+from src.feature_engineering import add_application_features, add_ext_source_features
 
 # ── Load model ────────────────────────────────────────────────
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "xgb_credit_risk_final.pkl")
+MODEL_PATH = os.path.join(MODEL_DIR, MODEL_FILE)
+if not os.path.exists(MODEL_PATH):   # HuggingFace Space keeps the model next to app.py
+    MODEL_PATH = os.path.join(os.path.dirname(__file__), MODEL_FILE)
 model = joblib.load(MODEL_PATH)
 
 # ── Prediction logic ──────────────────────────────────────────
@@ -26,21 +30,11 @@ def predict(ext1, ext2, ext3,
         "DAYS_BIRTH":       days_birth,  "DAYS_EMPLOYED":     days_employed,
         "AMT_GOODS_PRICE":  amt_goods,   "CNT_FAM_MEMBERS":   cnt_family,
     }
-    data["CREDIT_INCOME_RATIO"]     = data["AMT_CREDIT"]       / (data["AMT_INCOME_TOTAL"] + 1)
-    data["ANNUITY_INCOME_RATIO"]    = data["AMT_ANNUITY"]       / (data["AMT_INCOME_TOTAL"] + 1)
-    data["CREDIT_TERM"]             = data["AMT_ANNUITY"]       / (data["AMT_CREDIT"] + 1)
-    data["INCOME_PER_PERSON"]       = data["AMT_INCOME_TOTAL"]  / (data["CNT_FAM_MEMBERS"] + 1)
-    data["GOODS_PRICE_CREDIT_DIFF"] = data["AMT_CREDIT"]        - data["AMT_GOODS_PRICE"]
-    data["GOODS_TO_CREDIT_RATIO"]   = data["AMT_GOODS_PRICE"]   / (data["AMT_CREDIT"] + 1)
-    data["AGE_YEARS"]               = age_years
-    data["EMPLOYMENT_TO_AGE_RATIO"] = days_employed             / (days_birth + 1)
-    data["EXT_SOURCE_MEAN"]         = np.mean([ext1, ext2, ext3])
-    data["EXT_SOURCE_MIN"]          = np.min ([ext1, ext2, ext3])
-    data["EXT_SOURCE_MAX"]          = np.max ([ext1, ext2, ext3])
-    data["EXT_SOURCE_PROD"]         = ext1 * ext2 * ext3
-    data["EXT_SOURCE_STD"]          = np.std ([ext1, ext2, ext3])
 
+    # Derived features — same functions the training pipeline uses
     df = pd.DataFrame([data])
+    df = add_application_features(df)
+    df = add_ext_source_features(df)
     df = df.reindex(columns=model.get_booster().feature_names, fill_value=0)
     proba = model.predict_proba(df)[0, 1]
 

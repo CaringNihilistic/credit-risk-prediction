@@ -1,14 +1,12 @@
 # src/predict.py
-import os
 import pandas as pd
-import numpy as np
-from src.config import DATA_DIR, TEST_FILE, ID_COL, TARGET
+from src.config import ID_COL, TARGET, SUBMISSION_FILE
 from src.data_loader import load_test, build_dataset, clean
 from src.feature_engineering import build_features, apply_encoders, get_X_y
 from src.train import load_model
 
 
-def generate_submission(encoders, train_columns, output_path='submission.csv'):
+def generate_submission(encoders, train_columns, output_path=SUBMISSION_FILE):
     """
     Full prediction pipeline for test set.
 
@@ -36,12 +34,11 @@ def generate_submission(encoders, train_columns, output_path='submission.csv'):
     df_test = clean(df_test)
 
     # ── Feature engineering ────────────────────────────────
-    print("\nBuilding features...")
-    df_test, _ = build_features(df_test)
+    df_test, _ = build_features(df_test, encoders)
 
     # ── Align columns exactly to training ──────────────────
     # Drop TARGET and ID if present, then reindex to match train
-    X_test = df_test.drop(columns=[TARGET, ID_COL], errors='ignore')
+    X_test, _ = get_X_y(df_test)
     X_test = X_test.reindex(columns=train_columns, fill_value=0)
     print(f"  Test features aligned : {X_test.shape}")
 

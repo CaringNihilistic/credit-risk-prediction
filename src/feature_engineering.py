@@ -54,15 +54,24 @@ def encode_categoricals(df):
 
 
 def apply_encoders(df, encoders):
-    """Apply previously fitted encoders to a new dataframe (e.g. test set)."""
+    """
+    Apply previously fitted encoders to a new dataframe (e.g. test set).
+    Categories not seen during training are encoded as -1.
+    """
     for col, le in encoders.items():
         if col in df.columns:
-            df[col] = le.fit_transform(df[col].astype(str))
+            mapping = {cls: i for i, cls in enumerate(le.classes_)}
+            df[col] = df[col].astype(str).map(mapping).fillna(-1).astype(int)
     return df
 
 
-def build_features(df):
-    """Run full feature engineering pipeline. Returns df and encoders."""
+def build_features(df, encoders=None):
+    """
+    Run full feature engineering pipeline. Returns df and encoders.
+
+    Pass the encoders fitted on the training set to reuse them (e.g. test set);
+    leave as None to fit new ones.
+    """
     print("\nBuilding features...")
 
     df = add_application_features(df)
@@ -71,7 +80,10 @@ def build_features(df):
     df = add_ext_source_features(df)
     print(f"  After EXT_SOURCE features  : {df.shape}")
 
-    df, encoders = encode_categoricals(df)
+    if encoders is None:
+        df, encoders = encode_categoricals(df)
+    else:
+        df = apply_encoders(df, encoders)
     print(f"  After label encoding       : {df.shape}")
 
     return df, encoders

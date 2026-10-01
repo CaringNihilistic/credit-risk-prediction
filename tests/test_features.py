@@ -11,6 +11,8 @@ from src.feature_engineering import (
     add_application_features,
     add_ext_source_features,
     encode_categoricals,
+    apply_encoders,
+    build_features,
 )
 from src.data_loader import clean
 
@@ -192,6 +194,28 @@ def test_encode_categoricals_returns_encoders(sample_df):
     df, encoders = encode_categoricals(sample_df.copy())
     assert isinstance(encoders, dict)
     assert 'NAME_CONTRACT_TYPE' in encoders
+
+
+def test_apply_encoders_reuses_training_mapping(sample_df):
+    """A test set missing a category must still get the training codes."""
+    _, encoders = encode_categoricals(sample_df.copy())
+    df_test = pd.DataFrame({'NAME_CONTRACT_TYPE': ['Revolving loans']})
+    df_test = apply_encoders(df_test, encoders)
+    assert df_test['NAME_CONTRACT_TYPE'].iloc[0] == 1   # 0 if re-fitted on test
+
+
+def test_apply_encoders_unseen_category(sample_df):
+    _, encoders = encode_categoricals(sample_df.copy())
+    df_test = pd.DataFrame({'NAME_CONTRACT_TYPE': ['Never seen']})
+    df_test = apply_encoders(df_test, encoders)
+    assert df_test['NAME_CONTRACT_TYPE'].iloc[0] == -1
+
+
+def test_build_features_with_encoders_does_not_refit(sample_df):
+    _, encoders = build_features(sample_df.copy())
+    df_test, encoders_out = build_features(sample_df.iloc[[1]].copy(), encoders)
+    assert encoders_out is encoders
+    assert df_test['NAME_CONTRACT_TYPE'].iloc[0] == 1
 
 
 def test_no_data_leakage_target_not_in_features():

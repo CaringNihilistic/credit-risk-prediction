@@ -10,6 +10,7 @@ models/
 .ipynb_checkpoints/
 __pycache__/
 *.pyc
+.pytest_cache/
 
 # MLflow
 mlruns/

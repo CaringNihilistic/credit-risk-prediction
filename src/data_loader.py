@@ -19,20 +19,22 @@ def load_csv(filename):
     return df
 
 
+def load_required(filename):
+    """Load a CSV from DATA_DIR. Raises if file not found."""
+    df = load_csv(filename)
+    if df is None:
+        raise FileNotFoundError(f"{filename} is required but not found in {DATA_DIR}")
+    return df
+
+
 def load_train():
     """Load application_train.csv"""
-    df = load_csv(TRAIN_FILE)
-    if df is None:
-        raise FileNotFoundError(f"{TRAIN_FILE} is required but not found in {DATA_DIR}")
-    return df
+    return load_required(TRAIN_FILE)
 
 
 def load_test():
     """Load application_test.csv"""
-    df = load_csv(TEST_FILE)
-    if df is None:
-        raise FileNotFoundError(f"{TEST_FILE} is required but not found in {DATA_DIR}")
-    return df
+    return load_required(TEST_FILE)
 
 
 def load_bureau():

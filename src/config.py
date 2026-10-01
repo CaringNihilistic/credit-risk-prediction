@@ -12,15 +12,9 @@ TEST_FILE       = 'application_test.csv'
 MODEL_FILE      = 'xgb_credit_risk_final.pkl'
 SUBMISSION_FILE = 'submission.csv'
 
-# Auxiliary tables — loaded if present, skipped if missing
-AUX_FILES = [
-    'bureau.csv',
-    'bureau_balance.csv',
-    'previous_application.csv',
-    'installments_payments.csv',
-    'credit_card_balance.csv',
-    'POS_CASH_balance.csv',
-]
+# ── MLflow ───────────────────────────────────────────────────
+MLFLOW_TRACKING_URI = 'sqlite:///' + os.path.join(BASE_DIR, 'mlflow.db').replace('\\', '/')
+MLFLOW_EXPERIMENT   = 'home-credit-default-risk'
 
 # ── Column constants ─────────────────────────────────────────
 TARGET    = 'TARGET'
