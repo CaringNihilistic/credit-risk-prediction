@@ -341,7 +341,7 @@ FOOTER = """
     font-family:'DM Mono',monospace;font-size:0.74rem;margin-bottom:16px;">
     <div style="padding:8px 0;border-bottom:1px solid #1a2030;">
       <div style="color:#3a4a62;margin-bottom:2px;">VALIDATION AUC</div>
-      <div style="color:#e8edf5;font-weight:500;">0.786</div>
+      <div style="color:#e8edf5;font-weight:500;">0.784</div>
     </div>
     <div style="padding:8px 12px;border-bottom:1px solid #1a2030;">
       <div style="color:#3a4a62;margin-bottom:2px;">KAGGLE PUBLIC</div>

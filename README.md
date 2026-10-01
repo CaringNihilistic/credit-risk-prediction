@@ -1,7 +1,7 @@
 # Credit Risk Prediction — Home Credit Default Risk
 
 [![Python](https://img.shields.io/badge/Python-3.13-blue?style=flat-square)](https://python.org)
-[![XGBoost](https://img.shields.io/badge/XGBoost-2.x-orange?style=flat-square)](https://xgboost.readthedocs.io)
+[![XGBoost](https://img.shields.io/badge/XGBoost-3.x-orange?style=flat-square)](https://xgboost.readthedocs.io)
 [![Optuna](https://img.shields.io/badge/Optuna-3.x-green?style=flat-square)](https://optuna.org)
 [![MLflow](https://img.shields.io/badge/MLflow-3.x-blue?style=flat-square)](https://mlflow.org)
 [![Tests](https://img.shields.io/badge/Tests-27%20passed-brightgreen?style=flat-square)](tests/)
@@ -33,11 +33,12 @@ This project builds an end-to-end credit risk prediction system trained on **307
 |---|---|
 | Kaggle Public AUC | **0.782** |
 | Kaggle Private AUC | **0.778** |
-| Validation ROC-AUC (5-fold CV) | **0.786** |
+| Validation ROC-AUC (20% hold-out) | **0.784** |
+| Optuna best ROC-AUC (5-fold CV) | 0.780 |
 | F1-Optimal Threshold | **0.677** |
 | Best Iteration (early stopping) | 698 |
 | Training samples | 307,511 |
-| Features engineered | 157 |
+| Model input features | 157 |
 
 ### Classification Report (threshold = 0.677)
 
@@ -53,7 +54,7 @@ This project builds an end-to-end credit risk prediction system trained on **307
 ```
 credit-risk-prediction/
 ├── data/                        # Raw CSVs (not committed)
-├── models/                      # Saved model + encoders
+├── models/                      # Saved model (not committed)
 ├── notebooks/
 │   └── credit_risk_modeling.ipynb
 ├── src/
@@ -126,7 +127,7 @@ pip install -r requirements.txt
 ```
 
 ### 2. Place CSVs in `data/` folder
-Download from [Kaggle](https://www.kaggle.com/c/home-credit-default-risk/data) and place all 7 CSV files in the `data/` directory.
+Download from [Kaggle](https://www.kaggle.com/c/home-credit-default-risk/data) and place the 7 CSV files listed above in the `data/` directory, plus `application_test.csv` for the submission step.
 
 ### 3. Train the model
 ```python
@@ -155,6 +156,7 @@ submission = generate_submission(
 ```
 
 ### 5. Run the web app locally
+Needs the trained model from step 3 in `models/`.
 ```bash
 python app.py
 # → opens at http://localhost:7860
@@ -216,7 +218,7 @@ joblib
 ## Experiment Tracking (MLflow)
 
 All training runs are tracked with MLflow, logging:
-- All 11 Optuna hyperparameters per trial
+- The best trial's 11 Optuna hyperparameters and its CV ROC-AUC
 - Dataset statistics (train size, features, class weight)
 - Validation ROC-AUC, optimal threshold, best iteration
 - Feature importance CSV
@@ -225,6 +227,8 @@ All training runs are tracked with MLflow, logging:
 ```bash
 mlflow ui --backend-store-uri sqlite:///mlflow.db
 ```
+
+![MLflow run for the final model](docs/mlflow_dashboard.png)
 
 ---
 
